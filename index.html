@@ -1,4 +1,4 @@
-<!-- --- START OF index.html --- -->
+<!-- --- START OF index.html (UPDATED VERSION) --- -->
 <!DOCTYPE html>
 <html lang="he">
 <head>
@@ -7,79 +7,164 @@
     <title>DIG-ONE: מופעל אוטומציה ליוטיוב</title>
     <style>
         body { font-family: 'Arial', sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f9; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
         button { background-color: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
-        button:hover { background-color: #0056b3; }
-        #status { margin-top: 20px; padding: 15px; border: 1px solid #ccc; background-color: #e9ecef; border-radius: 5px; white-space: pre-wrap;}
+        button:hover:enabled { background-color: #0056b3; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        #statusContainer { margin-top: 20px; padding: 15px; border: 1px solid #ccc; background-color: #e9ecef; border-radius: 5px; white-space: pre-wrap;}
         h1 { color: #333; }
+
+        /* עיצוב לתוצאות */
+        .result-item { border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 5px; background-color: #fff; }
+        .success { border-left: 5px solid #28a745; background-color: #d4edda; }
+        .failure { border-left: 5px solid #dc3545; background-color: #f8d7da; }
+        .details { margin-top: 10px; font-size: 0.9em;}
+        .details strong { display: block; margin-top: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>DIG-ONE: מפעיל אוטומציה ליוטיוב (JavaScript API)</h1>
-        <p>במקום להריץ תוכנה מורכבת ב-Termux, הקוד הזה מריץ את הלוגיקה של ההרשמה ישירות בדפדפן.</p>
+        <h1>DIG-ONE: מפעיל אוטומציה ליוטיוב (JS Mockup)</h1>
+        <p>הקוד הזה ממחיש את התהליך המלא של יצירת חשבונות באמצעות סימולציה של API ואימות.</p>
         <button id="startBtn">🚀 הפעל סבב הרשמה חדש</button>
 
-        <div id="status">הסטטוס: מוכן להפעלה.</div>
+        <div id="statusContainer">
+            <p id="statusMessage">הסטטוס: מוכן להפעלה.</p>
+        </div>
+
+        <h3>📋 סיכום התוצאות:</h3>
+        <div id="resultsContainer">
+            <!-- כאן יוצגו החשבונות בהצלחה ובכישלון -->
+        </div>
     </div>
 
     <script>
         // ------------------------------------------------------------
-        // --- הגדרות גלובליות (חייבים להתאים לאפליקציה) ---
+        // --- הגדרות גלובליות ---
         // ------------------------------------------------------------
         const PASSWORD_BASE = "xxx123456";
-        const BATCH_SIZE = 50; 
-        const TEMP_EMAIL_PLACEHOLDER = "placeholder@tempmail.com"; 
+        const BATCH_SIZE = 5; // הפחתתי ל-5 לצורך בדיקה קלה
 
-        // *** נקודה קריטית: אם אתה לא משתמש ב-API חיצוני, את הלוגיקה הזו צריכה להתבצע על ידי שימוש ב-API של Google! ***
+        // *** הערה: במציאות, במקום placeholder, אנחנו יוצרים מייל חדש בכל איטרציה ***
+        // const TEMP_EMAIL_PLACEHOLDER = "placeholder@tempmail.com"; 
 
         // ------------------------------------------------------------
-        // --- לוגיקה המדומה של ההרשמה (מכאן שתבצע את החיבור ל-Google) ---
+        // --- פונקציות עזר ---
         // ------------------------------------------------------------
 
-        async function runAccountCreation() {
-            const statusElement = document.getElementById('status');
-            const startBtn = document.getElementById('startBtn');
-
-            startBtn.disabled = true;
-            statusElement.innerHTML = "🚧 ההרשמה החלה... יש להמתין ל-API חיצוני (Google API) להשלמת השלב.";
-
-            let successCount = 0;
-            let totalCount = 0;
-
-            for (let i = 0; i < BATCH_SIZE; i++) {
-                totalCount++;
-                // 1. יצירת סיסמה ייחודית:
-                const currentPassword = `${PASSWORD_BASE}_${i + 1}`;
-
-                // 2. לוגיקת ההרשמה (TODO: כאן צריך לבצע FETCH ל-Google API)
-                // לצורך הדגמה, נניח שההרשמה תמיד מצליחה:
-                let success = await mockGoogleApiCall(TEMP_EMAIL_PLACEHOLDER, currentPassword); 
-
-                if (success) {
-                    successCount++;
-                    console.log(`SUCCESS: חשבון ${totalCount} נוצר בהצלחה.`);
-                } else {
-                    console.error(`FAILURE: חשבון ${totalCount} נכשל.`);
-                }
-
-                // הפרדה (Simulation of Sleep)
-                await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 שניות איטית
-            }
-
-            statusElement.innerHTML = `🎉 ** סיום הסבב! ** 🎉\nסה"כ ננסיו: ${totalCount}\n✅ הצלחה: ${successCount}\n❌ כשל: ${totalCount - successCount}`;
-            startBtn.disabled = false;
+        /**
+         * פונקציה המייצרת כתובת מייל ייחודית (Simulation)
+         * *** ביישום אמיתי, פונקציה זו תתחבר ל-TempMail API ***
+         */
+        function generateUniqueEmail(index) {
+            // יוצר מייל שמכיל את המספור כדי להבדיל בין ה-50 חשבונות
+            return `user_acc_${index}@tempmailservice.com`; 
         }
 
         /**
-         * פונקציית הדגמה: מחליפה את כל המימוש של Selenium
-         * ב-API (Fetch)
+         * פונקציית דגמה: מדמה את הקריאה ל-Google API (שכאן אנחנו שילבנו את האימות)
+         * *** ביישום אמיתי, כאן יהיה FETCH ל-Google API, וה-VerifyCode יטפל באימות ***
+         * @param {string} email - המייל החדש
+         * @param {string} password - הסיסמה החדשה
+         * @returns {Promise<object>} - אובייקט המייצג את תוצאת החשבון
          */
         async function mockGoogleApiCall(email, password) {
-            // *** *** *** ** כאן אתה מחליף את הפונקציה הזו ב-FETCH אמיתי ל-Google API! ***
             console.log(`[API MOCK] מנסה להרשם: ${email} / ${password}`);
-            // עבור בדיקה ראשונית, אנו מניחים הצלחה
-            return true;
+
+            // --- סימולציית תקינה (Success) ---
+            // בהצלחה:
+            return { success: true, reason: "Account created successfully via Mock API." }; 
+
+            /* 
+            // --- דוגמה לסימולציה של כשל ---
+            // אם רוצים לבדוק כשל:
+            return { success: false, reason: "Google API returned validation error: Email already exists." }; 
+            */
+        }
+
+        // ------------------------------------------------------------
+        // --- לוגיקה ראשית של הפרויקט ---
+        // ------------------------------------------------------------
+
+        async function runAccountCreation() {
+            const statusMessage = document.getElementById('statusMessage');
+            const startBtn = document.getElementById('startBtn');
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            startBtn.disabled = true;
+            resultsContainer.innerHTML = ''; // ניקוי תוצאות ישנות
+            statusMessage.textContent = "🚧 ההרשמה החלה... מפעילים את לולאת האוטומציה.";
+
+            const allResults = [];
+
+            // לולאה מודרנית: שימוש ב-Promise.all כדי להריץ כמה שיותר במקביל (Parallelism)
+            const creationPromises = [];
+
+            for (let i = 0; i < BATCH_SIZE; i++) {
+                const currentPassword = `${PASSWORD_BASE}_${i + 1}`;
+                // יצירת מייל ייחודי לכל איטרציה
+                const uniqueEmail = generateUniqueEmail(i + 1); 
+
+                // בניית ההבטחה (Promise) עבור כל חשבון
+                const promise = mockGoogleApiCall(uniqueEmail, currentPassword)
+                    .then(apiResponse => ({
+                        success: apiResponse.success,
+                        email: uniqueEmail,
+                        password: currentPassword,
+                        reason: apiResponse.reason
+                    }))
+                    .catch(error => ({
+                        success: false,
+                        email: uniqueEmail,
+                        password: currentPassword,
+                        reason: `System Failure during call: ${error.message}`
+                    }));
+
+                creationPromises.push(promise);
+            }
+
+            // הרצת כל הבקשות במקביל
+            const resultsArray = await Promise.all(creationPromises);
+            allResults.push(...resultsArray);
+
+
+            // ------------------------------------------------------------
+            // --- הצגת התוצאות ---
+            // ------------------------------------------------------------
+
+            let successCount = 0;
+            let totalCount = allResults.length;
+
+            allResults.forEach(result => {
+                const resultItem = document.createElement('div');
+
+                if (result.success) {
+                    successCount++;
+                    resultItem.className = 'result-item success';
+                    resultItem.innerHTML = `
+                        <strong>✅ הצלחה:</strong> ${result.email} 
+
+                        <div class="details"><strong>סיסמה:</strong> ${result.password}</div>
+                    `;
+                } else {
+                    resultItem.className = 'result-item failure';
+                    resultItem.innerHTML = `
+                        <strong>❌ כשל:</strong> ${result.email} 
+
+                        <div class="details"><strong>סיבת הכשל:</strong> ${result.reason}</div>
+                    `;
+                }
+                resultsContainer.appendChild(resultItem);
+            });
+
+            // עדכון סטטוס סופי
+            document.getElementById('statusMessage').innerHTML = 
+                `🎉 ** סיום הסבב! ** 🎉
+סה"כ ננסיו: ${totalCount}
+✅ הצלחה: ${successCount}
+❌ כשל: ${totalCount - successCount}`;
+            startBtn.disabled = false;
         }
 
         // ------------------------------------------------------------
@@ -87,6 +172,6 @@
         // ------------------------------------------------------------
         document.getElementById('startBtn').addEventListener('click', runAccountCreation);
     </script>
-<!-- --- END OF index.html --- -->
 </body>
 </html>
+<!-- --- END OF index.html --- -->
