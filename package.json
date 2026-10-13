@@ -1,0 +1,17 @@
+{
+  "name": "youtube-automation",
+  "version": "1.0.0",
+  "description": "Automates YouTube account creation.",
+  "main": "automation_engine.js",
+  "scripts": {
+    "start": "node automation_engine.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0", 
+    "axios": "^1.6.8" 
+    // axios נדרש אם צריך להתחבר ל-API חיצוני של Temp Mail
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
