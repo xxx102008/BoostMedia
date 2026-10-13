@@ -1,17 +1,23 @@
 {
-  "name": "youtube-automation",
-  "version": "1.0.0",
-  "description": "Automates YouTube account creation.",
-  "main": "automation_engine.js",
+  "name": "boostmedia-automation",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Authorized signup-flow automation and email verification testing",
+  "main": "server.js",
   "scripts": {
-    "start": "node automation_engine.js"
+    "start": "node server.js",
+    "test:automation": "node automation_engine.js"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
-    "puppeteer": "^21.0.0", 
-    "axios": "^1.6.8" 
-    // axios נדרש אם צריך להתחבר ל-API חיצוני של Temp Mail
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "imapflow": "^1.0.181",
+    "mailparser": "^3.7.2",
+    "nodemailer": "^6.10.0",
+    "puppeteer": "^24.0.0"
   }
 }
