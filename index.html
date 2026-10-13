@@ -1,0 +1,92 @@
+<!-- --- START OF index.html --- -->
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIG-ONE: מופעל אוטומציה ליוטיוב</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        button { background-color: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; }
+        button:hover { background-color: #0056b3; }
+        #status { margin-top: 20px; padding: 15px; border: 1px solid #ccc; background-color: #e9ecef; border-radius: 5px; white-space: pre-wrap;}
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DIG-ONE: מפעיל אוטומציה ליוטיוב (JavaScript API)</h1>
+        <p>במקום להריץ תוכנה מורכבת ב-Termux, הקוד הזה מריץ את הלוגיקה של ההרשמה ישירות בדפדפן.</p>
+        <button id="startBtn">🚀 הפעל סבב הרשמה חדש</button>
+
+        <div id="status">הסטטוס: מוכן להפעלה.</div>
+    </div>
+
+    <script>
+        // ------------------------------------------------------------
+        // --- הגדרות גלובליות (חייבים להתאים לאפליקציה) ---
+        // ------------------------------------------------------------
+        const PASSWORD_BASE = "xxxmen1234";
+        const BATCH_SIZE = 50; 
+        const TEMP_EMAIL_PLACEHOLDER = "placeholder@tempmail.com"; 
+
+        // *** נקודה קריטית: אם אתה לא משתמש ב-API חיצוני, את הלוגיקה הזו צריכה להתבצע על ידי שימוש ב-API של Google! ***
+
+        // ------------------------------------------------------------
+        // --- לוגיקה המדומה של ההרשמה (מכאן שתבצע את החיבור ל-Google) ---
+        // ------------------------------------------------------------
+
+        async function runAccountCreation() {
+            const statusElement = document.getElementById('status');
+            const startBtn = document.getElementById('startBtn');
+
+            startBtn.disabled = true;
+            statusElement.innerHTML = "🚧 ההרשמה החלה... יש להמתין ל-API חיצוני (Google API) להשלמת השלב.";
+
+            let successCount = 0;
+            let totalCount = 0;
+
+            for (let i = 0; i < BATCH_SIZE; i++) {
+                totalCount++;
+                // 1. יצירת סיסמה ייחודית:
+                const currentPassword = `${PASSWORD_BASE}_${i + 1}`;
+
+                // 2. לוגיקת ההרשמה (TODO: כאן צריך לבצע FETCH ל-Google API)
+                // לצורך הדגמה, נניח שההרשמה תמיד מצליחה:
+                let success = await mockGoogleApiCall(TEMP_EMAIL_PLACEHOLDER, currentPassword); 
+
+                if (success) {
+                    successCount++;
+                    console.log(`SUCCESS: חשבון ${totalCount} נוצר בהצלחה.`);
+                } else {
+                    console.error(`FAILURE: חשבון ${totalCount} נכשל.`);
+                }
+
+                // הפרדה (Simulation of Sleep)
+                await new Promise(resolve => setTimeout(resolve, 1500)); // 1.5 שניות איטית
+            }
+
+            statusElement.innerHTML = `🎉 ** סיום הסבב! ** 🎉\nסה"כ ננסיו: ${totalCount}\n✅ הצלחה: ${successCount}\n❌ כשל: ${totalCount - successCount}`;
+            startBtn.disabled = false;
+        }
+
+        /**
+         * פונקציית הדגמה: מחליפה את כל המימוש של Selenium
+         * ב-API (Fetch)
+         */
+        async function mockGoogleApiCall(email, password) {
+            // *** *** *** ** כאן אתה מחליף את הפונקציה הזו ב-FETCH אמיתי ל-Google API! ***
+            console.log(`[API MOCK] מנסה להרשם: ${email} / ${password}`);
+            // עבור בדיקה ראשונית, אנו מניחים הצלחה
+            return true;
+        }
+
+        // ------------------------------------------------------------
+        // --- ההפעלת הלולאה (נקודת הכניסה) ---
+        // ------------------------------------------------------------
+        document.getElementById('startBtn').addEventListener('click', runAccountCreation);
+    </script>
+<!-- --- END OF index.html --- -->
+</body>
+</html>
